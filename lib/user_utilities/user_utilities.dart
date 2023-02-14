@@ -102,7 +102,8 @@ class UserUtilities with ChangeNotifier {
         (userData) {
           if (onComplete != null) {
             //En caso de que se haya definido una función en onComplete se hará
-            //un callback pasándole la data del usuario
+            //un callback pasándole la data del usuario y no se retornará la
+            //data
             onComplete.call(userData);
           } else {
             //En caso contrario se retornará la data del usuario como un mapa de
@@ -156,6 +157,13 @@ class UserUtilities with ChangeNotifier {
   setCurrentUser(user) {
     //
     _currentUser = user;
+
+    //
+    hasUser = true;
+
+    //
+    notifyListeners();
+
     //*
     debugPrint("UserUtilities: Se definió la data del usuario actual");
   }
