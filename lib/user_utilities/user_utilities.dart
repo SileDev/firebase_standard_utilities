@@ -119,7 +119,46 @@ class UserUtilities with ChangeNotifier {
     }
   }
 
+  //
   updateUser() {}
+
+  //
+  listenCurrentUser({
+    required userId,
+    required Function onUserChanges,
+  }) {
+    //Se ejecuta un bloque que puede tener errores de ejecución
+    try {
+      //*
+      debugPrint("UserUtilities: Se comenzó a escuchar el usuario requerido");
+      //Se ejecuta del stream
+      _userCollectionReference
+          .where("userId", isEqualTo: userId)
+          .snapshots()
+          .listen(
+        (event) {
+          //*
+          debugPrint("UserUtilities: Se detectó un cambio en el usuario");
+
+          //
+          onUserChanges.call(event.docs.first.data() as Map<String, dynamic>);
+        },
+      );
+    } catch (e) {
+      //Se notifica el error
+      //*
+      debugPrint("UserUtilities: No se pudo escuchar el usuario requerido");
+      debugPrint(e.toString());
+    }
+  }
+
+  //
+  setCurrentUser(user) {
+    //
+    _currentUser = user;
+    //*
+    debugPrint("UserUtilities: Se definió la data del usuario actual");
+  }
 
   //Obtener la data del usuario de la base de datos y asignarla al
   //almacenamiento persistente y al Utilities
