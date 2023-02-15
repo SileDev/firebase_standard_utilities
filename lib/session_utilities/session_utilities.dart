@@ -18,7 +18,7 @@ class SessionUtilities with ChangeNotifier {
   }) {
     try {
       //*
-      debugPrint("SessionController: Se está escuchando la sesión");
+      debugPrint("SessionUtilities: Se está escuchando la sesión");
       //Se intenta iniciar el Stream
       _sessionInstance.authStateChanges().listen((event) async {
         //Validar que haya una sesión
@@ -26,11 +26,11 @@ class SessionUtilities with ChangeNotifier {
           //
           if (!_hasSession) {
             //*
-            debugPrint("SessionController: Se inició sesión");
+            debugPrint("SessionUtilities: Se inició sesión");
 
             //*
             debugPrint(
-                "SessionController: Se requiere navegar a la ruta definida");
+                "SessionUtilities: Se requiere navegar a la ruta definida");
 
             //
             _hasSession = true;
@@ -54,7 +54,7 @@ class SessionUtilities with ChangeNotifier {
           //
           if (_hasSession) {
             //*
-            debugPrint("SessionController: Se cerró la sesión");
+            debugPrint("SessionUtilities: Se cerró la sesión");
 
             //
             _hasSession = false;
@@ -64,7 +64,7 @@ class SessionUtilities with ChangeNotifier {
                 .clearUser();*****/
 
             //*
-            debugPrint("SessionController: Se requiere navegar a Sign");
+            debugPrint("SessionUtilities: Se requiere navegar a Sign");
 
             //Ejecutae la acción definida para ser llamada en caso de tener una
             //sesión inválida
@@ -76,10 +76,10 @@ class SessionUtilities with ChangeNotifier {
             //1?
             if (!_hasInvalidRouteDispatched) {
               //*
-              debugPrint("SessionController: No se encontró una sesión activa");
+              debugPrint("SessionUtilities: No se encontró una sesión activa");
 
               //*
-              debugPrint("SessionController: Se requiere navegar a Sign");
+              debugPrint("SessionUtilities: Se requiere navegar a Sign");
 
               //Ejecutae la acción definida para ser llamada en caso de tener una
               //sesión inválida
@@ -93,14 +93,14 @@ class SessionUtilities with ChangeNotifier {
       });
     } on FirebaseAuthException catch (e) {
       //*
-      debugPrint("SessionController: $e");
+      debugPrint("SessionUtilities: $e");
       /*Validar errores*/
 
       //Reintentar todo
       //rethrow;
     } catch (e) {
       //*
-      debugPrint("SessionController: $e");
+      debugPrint("SessionUtilities: $e");
       /*Validar errores*/
     }
   }
