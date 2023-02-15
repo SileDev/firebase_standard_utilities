@@ -1,8 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:provider/provider.dart';
-import 'package:psychological_assistance_app/data/controllers/user/user_controller.dart';
 
 class SessionUtilities with ChangeNotifier {
   //Instancia de FirebaseAuth para la sesión
@@ -63,8 +60,8 @@ class SessionUtilities with ChangeNotifier {
             _hasSession = false;
 
             //Se limpia la data de todos los controllers
-            Provider.of<UserController>(Get.context!, listen: false)
-                .clearUser();
+            /*****Provider.of<UserController>(Get.context!, listen: false)
+                .clearUser();*****/
 
             //*
             debugPrint("SessionController: Se requiere navegar a Sign");
@@ -111,10 +108,12 @@ class SessionUtilities with ChangeNotifier {
   //Obtener la data del usuario de la sesión
   _getSessionUser() async {
     //Se consulta la data del usuario y se define en UserController
+
+    /***** 
     await Provider.of<UserController>(Get.context!, listen: false)
         .fetchAndSetUserData(
       userId: _sessionInstance.currentUser!.uid,
-    );
+    );*****/
   }
 
   //Registrar usuario con correo y contraseña
@@ -129,7 +128,8 @@ class SessionUtilities with ChangeNotifier {
         .then(
       (value) async {
         //Se define la data del usuario en el servidor
-        await Provider.of<UserController>(Get.context!, listen: false)
+
+        /*****await Provider.of<UserController>(Get.context!, listen: false)
             .setUserData(
           userId: value.user!.uid,
           chatIds: userData["chatIds"],
@@ -137,7 +137,7 @@ class SessionUtilities with ChangeNotifier {
               "https://images.vexels.com/media/users/3/140800/isolated/preview/86b482aaf1fec78a3c9c86b242c6ada8-perfil-de-hombre-avatar.png", //userData["profilePhotoUrl"],
           names: userData["names"],
           surnames: userData["surnames"],
-        );
+        );*****/
       },
     );
   }
