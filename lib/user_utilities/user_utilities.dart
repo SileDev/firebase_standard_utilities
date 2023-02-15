@@ -4,7 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class UserUtilities with ChangeNotifier {
   //Nombre de la colección que usará UserUtilities, esto puede ser sobreescrito
   //en caso de requerir que se use una colección diferente en el proyecto
-  final String collectionName = "users";
+  String collectionName = "users";
 
   //Referencia de la colección de usuarios que usará UserUtilities
   late final CollectionReference _userCollectionReference;
@@ -27,15 +27,20 @@ class UserUtilities with ChangeNotifier {
     return _currentUser;
   }
 
-  //Crear un usuario con la data indicada en la colección
+  //Definir el nombre de referencia de la colección que va a usar la utilidad
+  setCollectionReferenceName({required String collectionName}) {
+    this.collectionName = collectionName;
+  }
+
+  //Crear un usuario con la data indicada en la colección definida
   createUser({
     required String userId,
-    String? profilePhotoUrl,
-    String? names,
-    String? surnames,
-    String? countryCode,
-    int? phonePrefix,
-    int? phoneNumber,
+    // String? profilePhotoUrl,
+    // String? names,
+    // String? surnames,
+    // String? countryCode,
+    // int? phonePrefix,
+    // int? phoneNumber,
     Map<String, dynamic>? data,
     Function? onComplete,
   }) {
@@ -45,12 +50,12 @@ class UserUtilities with ChangeNotifier {
       _userCollectionReference.add(
         {
           "userId": userId,
-          if (profilePhotoUrl != null) "profilePhotoUrl": profilePhotoUrl,
-          if (names != null) "names": names,
-          if (surnames != null) "surnames": surnames,
-          if (countryCode != null) "countryCode": countryCode,
-          if (phonePrefix != null) "countryPrefix": phonePrefix,
-          if (phoneNumber != null) "phoneNumber": phoneNumber,
+          // if (profilePhotoUrl != null) "profilePhotoUrl": profilePhotoUrl,
+          // if (names != null) "names": names,
+          // if (surnames != null) "surnames": surnames,
+          // if (countryCode != null) "countryCode": countryCode,
+          // if (phonePrefix != null) "countryPrefix": phonePrefix,
+          // if (phoneNumber != null) "phoneNumber": phoneNumber,
           if (data != null) "data": data,
         },
       ).then(
@@ -74,8 +79,9 @@ class UserUtilities with ChangeNotifier {
     }
   }
 
-  //Obtener la data del usuario desde la base de datos, este método tiene 2
-  //tipos de ejecución
+  //Obtener la data del usuario desde la coleccíon, este método tiene 2 tipos
+  //de ejecución
+
   //1. si no se define onComplete retornará la data del usuario
   //2. si se define onComplete se ejecutará el callback con la data del usuario
   getUser({
@@ -120,11 +126,49 @@ class UserUtilities with ChangeNotifier {
     }
   }
 
-  //
+  //Actualizar la información de un usuario dentro de la colección definida
   updateUser() {}
 
-  //
-  listenCurrentUser({
+  //Eliminar usuario de la colección definida
+  deleteUser({
+    required userId,
+    Function? onComplete,
+  }) async {
+    //
+    try {
+      //
+      _userCollectionReference
+          .doc(
+            await _userCollectionReference
+                .where("userId", isEqualTo: userId)
+                .get()
+                .then((value) => value.docs.first.id),
+          )
+          .delete()
+          .then(
+        (_) {
+          //*
+          debugPrint("UserUtilities: Se eliminó el usuario requerido");
+
+          //
+          if (onComplete != null) {
+            //En caso de que se haya definido una función en onComplete se hará
+            //un callback pasándole la data del usuario y no se retornará la
+            //data
+            onComplete.call();
+          }
+        },
+      );
+    } catch (e) {
+      //Se notifica el error
+      //*
+      debugPrint("UserUtilities: No se pudo escuchar el usuario requerido");
+      debugPrint(e.toString());
+    }
+  }
+
+  //Escuchar la data del usuario actual en la colección definida
+  listenUser({
     required userId,
     required Function onUserChanges,
   }) {
@@ -153,7 +197,7 @@ class UserUtilities with ChangeNotifier {
     }
   }
 
-  //
+  //Definir la data del usuario actual
   setCurrentUser(user) {
     //
     _currentUser = user;
@@ -168,62 +212,8 @@ class UserUtilities with ChangeNotifier {
     debugPrint("UserUtilities: Se definió la data del usuario actual");
   }
 
-  //Obtener la data del usuario de la base de datos y asignarla al
-  //almacenamiento persistente y al Utilities
-  /*estará*/
-  // fetchAndSetUserData({
-  //   required String userId,
-  // }) async {
-  //   //Se ejecuta un bloque que puede tener respuestas de error
-  //   try {
-  //     //Se define la variable que almacenará la data del usuario y se intenta
-  //     //ejecutar la consulta que obtiene la data de la base de datos, luego se
-  //     //asigna la data que se obtuvo a la variable
-  //     Map<String, dynamic> newUserData = await _fetchUserData(userId: userId);
-
-  //     //En caso de fallar la consulta, el compilador pasará al catch de este try,
-  //     //en caso contrario continuará a partir de acá
-
-  //     /*Falta hacer validaciones a la data obtenida*/
-  //     //debugPrint(newUserData.toString());
-  //     debugPrint(
-  //         "UserUtilities: Se obtuvo la data del usuario desde la base de datos");
-
-  //     //
-  //     _currentUser = UserModel(
-  //       userId: newUserData["userId"],
-  //       profilePhotoUrl: newUserData["profilePhotoUrl"],
-  //       names: newUserData["names"],
-  //       surnames: newUserData["surnames"],
-  //       chatIds: List<String>.generate(
-  //         newUserData["chatIds"].length,
-  //         (index) => newUserData["chatIds"][index],
-  //       ),
-  //     );
-
-  //     //Se indica que el notificador tiene un usuario
-  //     if (!hasUser) {
-  //       hasUser = true;
-  //     }
-
-  //     //Se actualiza el notificador y se notifican los cambios a los oyentes
-  //     notifyListeners();
-
-  //     //*
-  //     debugPrint("UserUtilities: Se asignó el usuario del Utilities");
-  //   } on FirebaseException catch (e) {
-  //     //*
-  //     debugPrint("UserUtilities: $e");
-  //     /*Validar errores*/
-  //   } catch (e) {
-  //     //*
-  //     debugPrint("UserUtilities: Error obteniendo data del usuario");
-  //     /*Validar errores*/
-  //   }
-  // }
-
   //Eliminar la data del usuario actual
-  clearUser() {
+  clearCurrentUser() {
     //Se indica que el UserUtilities no tiene usuario
     hasUser = false;
 
@@ -234,6 +224,6 @@ class UserUtilities with ChangeNotifier {
     notifyListeners();
 
     //*
-    debugPrint("UserUtilities: Se eliminó el usuario del notificador");
+    debugPrint("UserUtilities: Se eliminó el usuario actual");
   }
 }
