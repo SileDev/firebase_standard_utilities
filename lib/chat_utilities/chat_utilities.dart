@@ -1,0 +1,3 @@
+class ChatUtilities with ChangeNotifier {
+
+}
