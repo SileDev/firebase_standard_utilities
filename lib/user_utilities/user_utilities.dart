@@ -198,7 +198,7 @@ class UserUtilities with ChangeNotifier {
   }
 
   //Definir la data del usuario actual
-  setCurrentUser(user) {
+  setCurrentUser({required dynamic user}) {
     //
     _currentUser = user;
 
