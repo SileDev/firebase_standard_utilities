@@ -1,8 +1,15 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
-//fdfedfjewofj
 class SessionUtilities with ChangeNotifier {
+  //Instancia para inicio de sesión con google
+  final googleSignIn =
+      GoogleSignIn(); //Inicializar instancia para hacer login con google
+
+  GoogleSignInAccount? _user;
+  GoogleSignInAccount get user => _user!;
+
   //Instancia de FirebaseAuth para la sesión
   final FirebaseAuth _sessionInstance = FirebaseAuth.instance;
 
@@ -106,17 +113,6 @@ class SessionUtilities with ChangeNotifier {
     }
   }
 
-  //Obtener la data del usuario de la sesión
-  /*_getSessionUser({Future<dynamic>? fetchAndSetUserData}) async {
-    //Se consulta la data del usuario y se define en UserUtilities
-    await fetchAndSetUserData ?? (){};
-    Provider.of<UserUtilities>(Get.context!, listen: false)
-        .fetchAndSetUserData(
-      userId: _sessionInstance.currentUser!.uid,
-    );
-    
-  }*/
-
   //Registrar usuario con correo y contraseña
   registerUserWithEmailAndPassword(
       {required String email,
@@ -178,6 +174,23 @@ class SessionUtilities with ChangeNotifier {
       //*
       debugPrint(e.toString());
       /*Validar errores*/
+    }
+  }
+
+  initSessionWithGoogle() async {
+    try {
+      final googleUser = await googleSignIn.signIn();
+      if (googleUser == null) return;
+      _user = googleUser;
+      final googleAuth = await googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+          accessToken: googleAuth.accessToken,
+          idToken: googleAuth.idToken); //aquí se enlaza con firebase (?)
+
+      await _sessionInstance.signInWithCredential(credential);
+      notifyListeners();
+    } catch (e) {
+      debugPrint(e.toString());
     }
   }
 }
