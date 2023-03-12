@@ -193,4 +193,18 @@ class SessionUtilities with ChangeNotifier {
       debugPrint(e.toString());
     }
   }
+
+  initSessionWithPhone(phoneNumber) async {
+    try {
+      await FirebaseAuth.instance.verifyPhoneNumber(
+        phoneNumber: '+57 $phoneNumber',
+        verificationCompleted: (PhoneAuthCredential credential) async {
+          await _sessionInstance.signInWithCredential(credential);
+        },
+        verificationFailed: (FirebaseAuthException e) {},
+        codeSent: (String verificationId, int? resendToken) {},
+        codeAutoRetrievalTimeout: (String verificationId) {},
+      );
+    } catch (e) {}
+  }
 }
